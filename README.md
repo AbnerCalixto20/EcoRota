@@ -1,5 +1,65 @@
+# EcoRota USP — Site público e projeto final
 
-# EcoRota USP
+**Grupo O | PMR3304 — Sistemas de Informação | Poli-USP | 2026**
+
+Esta é a **versão final unificada do projeto**, com React, Django, API REST,
+WebSocket, scripts SQL e documentação acadêmica. O mesmo código permite
+**execução local** e **publicação de um site público no Render usando Docker**.
+
+> **Atenção:** a opção gratuita é uma **demonstração pública com dados fictícios**, não
+> um serviço de caronas para uso real. No Render Free, o SQLite local é temporário:
+> registros e alterações dos visitantes podem desaparecer ao suspender, reiniciar
+> ou atualizar o serviço. Cadastro institucional e recuperação de senha ficam
+> desabilitados na versão pública, pois não há verificação de e-mail configurada.
+> O site é acessível a qualquer pessoa pelo link HTTPS, mas não deve receber dados reais.
+
+## Publicar o site no Render (gratuito)
+
+1. Use uma branch de publicação separada no GitHub (`deploy/render`).
+2. Coloque **todos os arquivos deste pacote na raiz do repositório**. O `Dockerfile`,
+   `.dockerignore` e `README.md` devem ficar no mesmo nível de `backend/` e `frontend/`.
+3. Faça commit e push das alterações dessa branch. **Não é necessário tornar o
+   repositório público**; é necessário autorizar o Render a acessá-lo.
+4. No [Render Dashboard](https://dashboard.render.com), selecione
+   **New > Web Service > Git Provider**, conecte o repositório `AbnerCalixto20/EcoRota`.
+5. Preencha: **Language/Runtime = Docker**, **Branch = deploy/render**,
+   **Root Directory = vazio**, **Dockerfile Path = Dockerfile**,
+   **Instance Type = Free**, **Health Check Path = /api/health**.
+6. Em **Environment**, adicione **`DJANGO_SECRET_KEY`** com uma chave gerada
+   aleatoriamente, com **no mínimo 40 caracteres**, privada. Nunca faça commit
+   dessa chave. **Não** configure `DATABASE_URL` nesta opção de demonstração.
+7. Clique em **Deploy Web Service**. Quando aparecer **Live**, abra o endereço
+   `https://<nome-do-servico>.onrender.com` fornecido pelo Render.
+8. Teste a página inicial, login, pesquisa de caronas, dashboard e chat usando
+   apenas os usuários fictícios abaixo.
+
+O Render não precisa de comandos manuais de `npm` ou `pip`: o `Dockerfile` faz
+essas instalações e compila o frontend. O script `deploy/start.sh` inicia o
+Django/ASGI na porta esperada pelo Render e cria os dados fictícios se necessário.
+
+**Login público de demonstração:** `ana.lima@usp.br` / `EcoRota@2026`.
+
+**Site público não significa repositório público:** qualquer visitante poderá
+abrir o link do Render, mas o GitHub pode continuar privado. O serviço leva
+aproximadamente um minuto para despertar após 15 minutos sem uso, dependendo
+das condições atuais do Render.
+
+Para mais detalhes: [`deploy/README_RENDER.md`](deploy/README_RENDER.md).
+
+---
+
+## Execução local e documentação acadêmica
+
+O restante deste README descreve a execução local e os recursos implementados.
+O painel administrativo com a senha de exemplo mencionado abaixo **existe apenas
+no ambiente local**; a versão pública **não cria superusuário nem disponibiliza
+`/admin/`**. Para tornar o EcoRota um serviço permanente com cadastro real,
+seriam necessárias persistência de dados, autenticação institucional comprovada,
+serviço de e-mail e revisão adicional de segurança e privacidade.
+
+---
+
+## Visão geral do EcoRota
 
 **Plataforma de Caronas Universitárias Solidárias**
 
@@ -75,9 +135,8 @@ EcoRota/
 |-- docs/
 |   |-- Proposta Grupo O.pdf
 |   |-- Casos-de-Usos-EcoRota.pdf
-|   |-- Entrega Entidade Relação/
-|       |-- EcoRota_DER.pdf
-|       |-- EcoRotaDER_DiretoDB_Browser.pdf
+|   |-- EcoRota_DER.pdf
+|   |-- EcoRotaDER_DiretoDB_Browser.pdf
 |
 |-- dev.mjs
 |-- package.json
