@@ -1,0 +1,31 @@
+# Dependências Node / React
+node_modules/
+frontend/node_modules/
+
+# Python / Django (conforme Lab 1 e Lab 3 PMR3304)
+.venv/
+backend/.venv/
+**/__pycache__/
+*.py[cod]
+backend/staticfiles/
+db.sqlite3
+
+# Builds
+frontend/dist/
+*.tsbuildinfo
+
+# Variáveis de ambiente e segredos
+.env
+backend/.env
+frontend/.env
+
+# Banco SQLite local gerado em tempo de execução
+database/*.sqlite
+database/*.sqlite-journal
+database/*.sqlite-wal
+database/*.sqlite-shm
+
+# Logs e SO
+*.log
+.DS_Store
+Thumbs.db

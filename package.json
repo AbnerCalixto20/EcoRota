@@ -1,0 +1,12 @@
+{
+  "name": "ecorotas",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node dev.mjs",
+    "dev:backend": "backend\\.venv\\Scripts\\python.exe backend\\manage.py runserver 127.0.0.1:8000",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "db:reset": "backend\\.venv\\Scripts\\python.exe database\\reset_db.py",
+    "build": "npm --prefix frontend run build"
+  }
+}
