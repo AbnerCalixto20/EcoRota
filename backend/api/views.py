@@ -47,6 +47,8 @@ def health(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def register(request):
+    if settings.PUBLIC_DEMO:
+        return Response({"error": "Cadastro indisponível nesta demonstração pública. Use uma conta de teste na página de login."}, status=403)
     data = request.data or {}
     nome = str(data.get("nome_completo") or "").strip()
     nusp = str(data.get("nusp") or "").strip()
@@ -101,6 +103,8 @@ def register(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def activate(request):
+    if settings.PUBLIC_DEMO:
+        return Response({"error": "Ativação de contas indisponível nesta demonstração pública."}, status=403)
     raw_token = str((request.data or {}).get("token") or "").strip()
     if not raw_token:
         return Response({"error": "Token de ativação obrigatório."}, status=400)
@@ -216,6 +220,8 @@ def me(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def forgot_password(request):
+    if settings.PUBLIC_DEMO:
+        return Response({"error": "Recuperação de senha indisponível nesta demonstração pública."}, status=403)
     email = str((request.data or {}).get("email_institucional") or "").strip()
     if not email:
         return Response({"error": "Informe o e-mail institucional associado à conta."}, status=400)
@@ -241,6 +247,8 @@ def forgot_password(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def reset_password(request):
+    if settings.PUBLIC_DEMO:
+        return Response({"error": "Recuperação de senha indisponível nesta demonstração pública."}, status=403)
     data = request.data or {}
     raw_token = str(data.get("token") or "").strip()
     nova_senha = data.get("nova_senha") or ""

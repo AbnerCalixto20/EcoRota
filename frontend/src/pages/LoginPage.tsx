@@ -38,7 +38,9 @@ export function LoginPage() {
           </span>
           <h1 className="text-3xl font-bold tracking-tight text-black mt-1">Fazer login</h1>
           <p className="mt-2 text-sm text-[#5e5e5e]">
-            Acesse sua conta institucional para solicitar ou oferecer caronas na comunidade USP.
+            {import.meta.env.VITE_PUBLIC_DEMO === 'true'
+              ? 'Demonstração acadêmica pública. Utilize somente as contas fictícias indicadas abaixo; os dados podem ser reiniciados.'
+              : 'Acesse sua conta institucional para solicitar ou oferecer caronas na comunidade USP.'}
           </p>
         </div>
 
@@ -66,9 +68,11 @@ export function LoginPage() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-semibold text-black">Senha</label>
-              <Link to="/recuperar-senha" className="text-xs font-medium text-neutral-600 hover:text-black underline">
-                Esqueci minha senha
-              </Link>
+              {import.meta.env.VITE_PUBLIC_DEMO !== 'true' && (
+                <Link to="/recuperar-senha" className="text-xs font-medium text-neutral-600 hover:text-black underline">
+                  Esqueci minha senha
+                </Link>
+              )}
             </div>
             <div className="relative">
               <input
@@ -125,12 +129,14 @@ export function LoginPage() {
           </div>
         </div>
 
-        <p className="mt-6 text-center text-xs text-[#5e5e5e]">
-          Ainda não tem conta?{' '}
-          <Link to="/cadastro" className="font-semibold text-black underline">
-            Cadastre-se com @usp.br
-          </Link>
-        </p>
+        {import.meta.env.VITE_PUBLIC_DEMO !== 'true' && (
+          <p className="mt-6 text-center text-xs text-[#5e5e5e]">
+            Ainda não tem conta?{' '}
+            <Link to="/cadastro" className="font-semibold text-black underline">
+              Cadastre-se com @usp.br
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );

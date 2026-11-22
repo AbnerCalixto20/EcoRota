@@ -1,0 +1,23 @@
+# Imagem publica: somente código e arquivos indispensáveis.
+.git
+.github
+.venv
+backend/.venv
+**/__pycache__
+**/*.pyc
+**/*.pyo
+node_modules
+frontend/node_modules
+frontend/dist
+backend/staticfiles
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
+.env
+**/.env
+*.log
+*.zip
+docs/
+README.md
+.DS_Store
