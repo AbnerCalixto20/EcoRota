@@ -85,7 +85,7 @@ export function HomePage() {
           <div className="lg:col-span-6 space-y-6">
             <div className="inline-flex items-center gap-2 bg-eco-soft border border-eco-border text-eco-dark px-3 py-1 rounded-full text-xs font-semibold">
               <span className="w-2 h-2 rounded-full bg-eco" />
-              Rede Oficial de Caronas Solidárias • USP Butantã
+              {import.meta.env.VITE_PUBLIC_DEMO === 'true' ? 'Projeto acadêmico de demonstração • Não oficial' : 'Rede Oficial de Caronas Solidárias • USP Butantã'}
             </div>
 
             <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-black leading-[1.12]">
