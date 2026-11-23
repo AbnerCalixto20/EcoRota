@@ -1,17 +1,27 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ApiError, apiRequest } from '../api';
 
 export function RecuperarSenhaPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<'request' | 'reset'>('request');
+  const [searchParams] = useSearchParams();
+  const initialToken = searchParams.get('token') || '';
+  const [step, setStep] = useState<'request' | 'reset'>(initialToken ? 'reset' : 'request');
   const [email, setEmail] = useState('');
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState(initialToken);
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const urlToken = searchParams.get('token');
+    if (urlToken) {
+      setToken(urlToken);
+      setStep('reset');
+    }
+  }, [searchParams]);
 
   const handleRequestToken = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,14 +64,6 @@ export function RecuperarSenhaPage() {
       setLoading(false);
     }
   };
-
-  if (import.meta.env.VITE_PUBLIC_DEMO === 'true') {
-    return <div className="max-w-xl mx-auto p-10 text-center space-y-4">
-      <h1 className="text-2xl font-bold">Demonstração pública</h1>
-      <p>A recuperação de senha está desabilitada nesta demonstração. Use as credenciais fictícias da tela de login.</p>
-      <Link className="font-semibold underline" to="/login">Voltar ao login de demonstração</Link>
-    </div>;
-  }
 
   return (
     <div className="min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12 bg-white">

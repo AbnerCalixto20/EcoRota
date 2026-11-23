@@ -4,15 +4,12 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
-DEFAULT_SQLITE_PATH = PROJECT_ROOT / "database" / "ecorota.sqlite"
+DEFAULT_SQLITE_PATH = Path(
+    os.environ.get("ECOROTA_DB_PATH", str(PROJECT_ROOT / "database" / "ecorota.sqlite"))
+).resolve()
 
-PUBLIC_DEMO = os.environ.get("ECOROTA_PUBLIC_DEMO", "0") == "1"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "ecorota-usp-pmr3304-django-dev-secret-key-2026")
-if PUBLIC_DEMO and (not os.environ.get("DJANGO_SECRET_KEY") or len(SECRET_KEY) < 40):
-    raise RuntimeError("Defina DJANGO_SECRET_KEY (40+ caracteres) nas variáveis de ambiente do Render.")
-DEBUG = os.environ.get("DJANGO_DEBUG", "False" if PUBLIC_DEMO else "True").lower() in ("1", "true", "yes")
-if PUBLIC_DEMO and DEBUG:
-    raise RuntimeError("A demonstração pública não permite DJANGO_DEBUG=True.")
+DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
 ALLOWED_HOSTS = [
     h.strip()
     for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,testserver").split(",")
@@ -91,14 +88,17 @@ CORS_ALLOWED_ORIGINS = [
     for o in os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
     if o.strip()
 ]
+if RENDER_HOST and f"https://{RENDER_HOST}" not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append(f"https://{RENDER_HOST}")
+
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = list(CORS_ALLOWED_ORIGINS)
-if RENDER_HOST:
-    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_HOST}")
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") if PUBLIC_DEMO else None
-SECURE_SSL_REDIRECT = PUBLIC_DEMO and bool(os.environ.get("RENDER"))
-SESSION_COOKIE_SECURE = PUBLIC_DEMO
-CSRF_COOKIE_SECURE = PUBLIC_DEMO
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = bool(os.environ.get("RENDER"))
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 
@@ -116,15 +116,36 @@ REST_FRAMEWORK = {
 JWT_EXPIRES_HOURS = int(os.environ.get("JWT_EXPIRES_HOURS", "12"))
 DATA_UPLOAD_MAX_MEMORY_SIZE = 8 * 1024 * 1024
 
+# E-mail SMTP (opcional): quando configurado envia ativação/recuperação reais;
+# sem SMTP, permite validação instantânea na tela para testes sem bloquear cadastros.
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com").strip()
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() in ("1", "true", "yes")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "").strip()
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "").strip()
+EMAIL_CONFIGURED = bool(EMAIL_HOST_USER and EMAIL_HOST_PASSWORD)
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend"
+    if EMAIL_CONFIGURED
+    else "django.core.mail.backends.console.EmailBackend"
+)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER or "noreply@ecorota.usp.br")
+FRONTEND_URL = os.environ.get(
+    "FRONTEND_URL",
+    f"https://{RENDER_HOST}" if RENDER_HOST else "http://localhost:5173",
+).rstrip("/")
+SHOW_INLINE_AUTH_TOKENS = os.environ.get(
+    "SHOW_INLINE_AUTH_TOKENS", "False" if EMAIL_CONFIGURED else "True"
+).lower() in ("1", "true", "yes")
+
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
 USE_TZ = False
 
 STATIC_URL = "/static/"
-# No Render, collectstatic coloca os recursos do Vite em /static/frontend/.
 FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
-if PUBLIC_DEMO and FRONTEND_DIST.is_dir():
+if FRONTEND_DIST.is_dir():
     STATICFILES_DIRS = [("frontend", FRONTEND_DIST)]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

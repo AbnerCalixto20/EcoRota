@@ -3,6 +3,7 @@ import re
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
+from django.core.mail import send_mail
 from django.db import connection, transaction
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -47,8 +48,6 @@ def health(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def register(request):
-    if settings.PUBLIC_DEMO:
-        return Response({"error": "Cadastro indisponível nesta demonstração pública. Use uma conta de teste na página de login."}, status=403)
     data = request.data or {}
     nome = str(data.get("nome_completo") or "").strip()
     nusp = str(data.get("nusp") or "").strip()
@@ -90,12 +89,37 @@ def register(request):
                 [uid, hash_token(raw_token), expira_sql],
             )
 
+    email_sent = False
+    if getattr(settings, "EMAIL_CONFIGURED", False):
+        link = f"{settings.FRONTEND_URL}/cadastro?token={raw_token}"
+        try:
+            send_mail(
+                subject="EcoRota USP — Confirme seu e-mail institucional",
+                message=(
+                    f"Olá, {nome}!\n\n"
+                    f"Para ativar sua conta no EcoRota USP, clique no link abaixo ou cole o código na página de cadastro:\n"
+                    f"{link}\n\n"
+                    f"Código de ativação: {raw_token}\n"
+                    f"Validade: 24 horas.\n"
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            email_sent = True
+        except Exception:
+            email_sent = False
+
     payload = {
-        "message": "Cadastro realizado! Confirme seu e-mail institucional para ativar a conta.",
+        "message": (
+            "Cadastro realizado! Enviamos um link de confirmação para o seu e-mail @usp.br."
+            if email_sent
+            else "Cadastro realizado! Confirme seu e-mail institucional para ativar a conta."
+        ),
         "id_usuario": uid,
         "status_conta": "PENDENTE_ATIVACAO",
     }
-    if settings.DEBUG:
+    if settings.DEBUG or getattr(settings, "SHOW_INLINE_AUTH_TOKENS", False) or not email_sent:
         payload["dev_activation_token"] = raw_token
     return Response(payload, status=201)
 
@@ -103,8 +127,6 @@ def register(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def activate(request):
-    if settings.PUBLIC_DEMO:
-        return Response({"error": "Ativação de contas indisponível nesta demonstração pública."}, status=403)
     raw_token = str((request.data or {}).get("token") or "").strip()
     if not raw_token:
         return Response({"error": "Token de ativação obrigatório."}, status=400)
@@ -220,8 +242,6 @@ def me(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def forgot_password(request):
-    if settings.PUBLIC_DEMO:
-        return Response({"error": "Recuperação de senha indisponível nesta demonstração pública."}, status=403)
     email = str((request.data or {}).get("email_institucional") or "").strip()
     if not email:
         return Response({"error": "Informe o e-mail institucional associado à conta."}, status=400)
@@ -235,7 +255,27 @@ def forgot_password(request):
                 "INSERT INTO Token_Usuario (id_usuario, finalidade, token_hash, expira_em) VALUES (%s, 'RECUPERACAO', %s, %s)",
                 [user["id_usuario"], hash_token(raw_token), now_sql_datetime(30)],
             )
-        if settings.DEBUG:
+        email_sent = False
+        if getattr(settings, "EMAIL_CONFIGURED", False):
+            link = f"{settings.FRONTEND_URL}/recuperar-senha?token={raw_token}"
+            try:
+                send_mail(
+                    subject="EcoRota USP — Recuperação de senha",
+                    message=(
+                        f"Você solicitou a redefinição de senha da sua conta EcoRota USP.\n\n"
+                        f"Acesse o link abaixo ou informe o código na tela de recuperação:\n"
+                        f"{link}\n\n"
+                        f"Código: {raw_token}\n"
+                        f"Validade: 30 minutos.\n"
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+                email_sent = True
+            except Exception:
+                email_sent = False
+        if settings.DEBUG or getattr(settings, "SHOW_INLINE_AUTH_TOKENS", False) or not email_sent:
             dev_token = raw_token
 
     resp = {"message": "Se o e-mail estiver cadastrado, enviamos um token de redefinição (validade: 30 min)."}
@@ -247,8 +287,6 @@ def forgot_password(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def reset_password(request):
-    if settings.PUBLIC_DEMO:
-        return Response({"error": "Recuperação de senha indisponível nesta demonstração pública."}, status=403)
     data = request.data or {}
     raw_token = str(data.get("token") or "").strip()
     nova_senha = data.get("nova_senha") or ""
