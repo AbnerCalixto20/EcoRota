@@ -38,9 +38,7 @@ export function LoginPage() {
           </span>
           <h1 className="text-3xl font-bold tracking-tight text-black mt-1">Fazer login</h1>
           <p className="mt-2 text-sm text-[#5e5e5e]">
-            {import.meta.env.VITE_PUBLIC_DEMO === 'true'
-              ? 'Demonstração acadêmica pública. Utilize somente as contas fictícias indicadas abaixo; os dados podem ser reiniciados.'
-              : 'Acesse sua conta institucional para solicitar ou oferecer caronas na comunidade USP.'}
+            Acesse sua conta institucional para solicitar ou oferecer caronas na comunidade USP.
           </p>
         </div>
 
@@ -68,11 +66,9 @@ export function LoginPage() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-semibold text-black">Senha</label>
-              {import.meta.env.VITE_PUBLIC_DEMO !== 'true' && (
-                <Link to="/recuperar-senha" className="text-xs font-medium text-neutral-600 hover:text-black underline">
-                  Esqueci minha senha
-                </Link>
-              )}
+              <Link to="/recuperar-senha" className="text-xs font-medium text-neutral-600 hover:text-black underline">
+                Esqueci minha senha
+              </Link>
             </div>
             <div className="relative">
               <input
@@ -102,41 +98,41 @@ export function LoginPage() {
           </button>
         </form>
 
-        {/* Atalho de contas demo */}
-        <div className="mt-6 pt-5 border-t border-neutral-200 space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
-            Contas de demonstração (senha: EcoRota@2026)
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { label: 'Ana (Motorista)', email: 'ana.lima@usp.br' },
-              { label: 'Bruno (Motorista)', email: 'bruno.silva@usp.br' },
-              { label: 'Carla (Passageira)', email: 'carla.mendes@usp.br' },
-              { label: 'Diego (Passageiro)', email: 'diego.ferreira@usp.br' },
-            ].map((demo) => (
-              <button
-                key={demo.email}
-                type="button"
-                onClick={() => {
-                  setIdentificador(demo.email);
-                  setSenha('EcoRota@2026');
-                }}
-                className="px-3 py-1 rounded-full bg-white border border-neutral-300 text-xs font-medium text-black hover:bg-black hover:text-white transition-colors"
-              >
-                {demo.label}
-              </button>
-            ))}
+        {/* Atalho de contas demo (exibido apenas em desenvolvimento local) */}
+        {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+          <div className="mt-6 pt-5 border-t border-neutral-200 space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+              Contas de demonstração (senha: EcoRota@2026)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Ana (Motorista)', email: 'ana.lima@usp.br' },
+                { label: 'Bruno (Motorista)', email: 'bruno.silva@usp.br' },
+                { label: 'Carla (Passageira)', email: 'carla.mendes@usp.br' },
+                { label: 'Diego (Passageiro)', email: 'diego.ferreira@usp.br' },
+              ].map((demo) => (
+                <button
+                  key={demo.email}
+                  type="button"
+                  onClick={() => {
+                    setIdentificador(demo.email);
+                    setSenha('EcoRota@2026');
+                  }}
+                  className="px-3 py-1 rounded-full bg-white border border-neutral-300 text-xs font-medium text-black hover:bg-black hover:text-white transition-colors"
+                >
+                  {demo.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-
-        {import.meta.env.VITE_PUBLIC_DEMO !== 'true' && (
-          <p className="mt-6 text-center text-xs text-[#5e5e5e]">
-            Ainda não tem conta?{' '}
-            <Link to="/cadastro" className="font-semibold text-black underline">
-              Cadastre-se com @usp.br
-            </Link>
-          </p>
         )}
+
+        <p className="mt-6 text-center text-xs text-[#5e5e5e]">
+          Ainda não tem conta?{' '}
+          <Link to="/cadastro" className="font-semibold text-black underline">
+            Cadastre-se com @usp.br
+          </Link>
+        </p>
       </div>
     </div>
   );

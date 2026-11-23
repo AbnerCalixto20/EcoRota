@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ApiError, apiRequest } from '../api';
 
 export function CadastroPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({
     nome_completo: '',
     nusp: '',
@@ -14,9 +15,17 @@ export function CadastroPage() {
   });
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  const [activationToken, setActivationToken] = useState('');
+  const [activationToken, setActivationToken] = useState(searchParams.get('token') || '');
   const [activating, setActivating] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const urlToken = searchParams.get('token');
+    if (urlToken) {
+      setActivationToken(urlToken);
+      setSuccessMsg('Link de confirmação detectado! Clique abaixo para ativar sua conta.');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,14 +70,6 @@ export function CadastroPage() {
     }
   };
 
-  if (import.meta.env.VITE_PUBLIC_DEMO === 'true') {
-    return <div className="max-w-xl mx-auto p-10 text-center space-y-4">
-      <h1 className="text-2xl font-bold">Demonstração pública</h1>
-      <p>O cadastro está desabilitado nesta demonstração acadêmica. Utilize uma das contas fictícias disponíveis na tela de login.</p>
-      <Link className="font-semibold underline" to="/login">Ir para o login de demonstração</Link>
-    </div>;
-  }
-
   return (
     <div className="min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12 bg-white">
       <div className="w-full max-w-[520px] bg-[#f8f8f9] border border-[#e6e6e6] rounded-2xl p-6 sm:p-10 shadow-sm">
@@ -94,7 +95,7 @@ export function CadastroPage() {
             {activationToken && (
               <div className="space-y-2 pt-2 border-t border-eco-border">
                 <p className="text-[11px]">
-                  Modo desenvolvimento — token gerado em <code>Token_Usuario</code>:
+                  Código de ativação institucional (válido por 24h):
                 </p>
                 <input
                   type="text"

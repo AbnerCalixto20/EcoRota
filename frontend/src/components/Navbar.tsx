@@ -147,9 +147,7 @@ export function Navbar() {
           ) : (
             <div className="flex items-center gap-2 text-sm font-medium">
               <Link to="/login" className="px-3 py-2 rounded-full hover:bg-[#f3f3f4] text-black">Fazer login</Link>
-              {import.meta.env.VITE_PUBLIC_DEMO !== 'true' && (
-                <Link to="/cadastro" className="px-4 py-2 rounded-full bg-black text-white hover:bg-neutral-800 shadow-sm">Cadastre-se</Link>
-              )}
+              <Link to="/cadastro" className="px-4 py-2 rounded-full bg-black text-white hover:bg-neutral-800 shadow-sm">Cadastre-se</Link>
             </div>
           )}
 

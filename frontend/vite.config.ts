@@ -3,8 +3,8 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  // O Render usa Django/WhiteNoise no mesmo domínio; desenvolvimento local segue normal.
-  base: process.env.ECOROTA_RENDER_BUILD === '1' ? '/static/frontend/' : '/', 
+  // Em produção (Render/Docker), Django/WhiteNoise serve o bundle em /static/frontend/.
+  base: process.env.ECOROTA_RENDER_BUILD === '1' ? '/static/frontend/' : '/',
   server: {
     port: 5173,
     proxy: {
