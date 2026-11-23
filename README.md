@@ -1,56 +1,57 @@
-# EcoRota USP (PMR3304 — Sistemas de Informação)
+# EcoRota USP
 
-Plataforma de caronas universitárias solidárias para a comunidade USP (`@usp.br` + NUSP), desenvolvida em **Django + Django REST Framework + React (Vite)** com banco **SQLite** (15 tabelas, 12 índices, 6 views e 18 triggers).
+Sistema web de caronas universitárias solidárias para a comunidade USP (`@usp.br` e NUSP), feito para a disciplina **PMR3304 — Sistemas de Informação** (Escola Politécnica da USP).
 
-**Grupo O:** Ábner Calixto Miranda Santos, Mikael Oliveira Carneiro, Pedro Tomasini e Yuri Leonardo Soares Ribeiro.
+- **Site no ar:** https://ecorota-usp.onrender.com
+- **Grupo O:** Ábner Calixto Miranda Santos, Mikael Oliveira Carneiro, Pedro Tomasini e Yuri Leonardo Soares Ribeiro.
 
-## Estrutura do Projeto
+## Tecnologias
 
-```text
-Ecorotas/
-├── database/          # Banco SQLite oficial (schema.sql, seed.sql, ecorota.sqlite, reset_db.py)
-├── backend/           # API REST + WebSocket em Django (manage.py, ecorota/, api/)
-└── frontend/          # Interface web em React + TypeScript + Tailwind (src/components/, src/pages/)
-```
+- **Backend:** Django + Django REST Framework + Channels (WebSocket)
+- **Frontend:** React + TypeScript + Vite + Tailwind CSS
+- **Banco de Dados:** SQLite
 
-## Primeira Execução (após descompactar ou clonar)
+## Pastas do projeto
 
-Pré-requisitos: **Python 3.11+** e **Node.js 18+**.
+- `backend/` — API REST, autenticação e chat em tempo real em Django
+- `frontend/` — interface web em React
+- `database/` — `schema.sql`, `seed.sql` e script `reset_db.py` do banco SQLite
+- `docs/` — proposta, casos de uso e diagramas ER do trabalho
+
+## Como rodar no computador
+
+Você vai precisar de **Python 3.11+** e **Node.js 18+**.
+
+1. Instale as dependências (só na primeira vez):
 
 ```powershell
-# 1. Entre na pasta do projeto
-cd Ecorotas
-
-# 2. Crie o ambiente virtual Python e instale as dependências do backend
 py -m venv backend\.venv
 backend\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
-
-# 3. Instale as dependências do frontend React
 npm.cmd --prefix frontend install
-
-# 4. (Opcional) Recrie o banco SQLite com os dados de demonstração
 npm.cmd run db:reset
 ```
 
-*(No Linux/macOS, use `python3 -m venv backend/.venv`, `backend/.venv/bin/python -m pip install -r backend/requirements.txt` e `npm` no lugar de `npm.cmd`.)*
+*(No Linux ou macOS, use `python3` no lugar de `py`, `backend/.venv/bin/python` e `npm` no lugar de `npm.cmd`.)*
 
-## Como Rodar Localmente
+2. Inicie o backend e o frontend juntos:
 
 ```powershell
-cd Ecorotas
 npm.cmd run dev
 ```
 
-- **Site (React):** `http://localhost:5173`
-- **API (Django):** `http://127.0.0.1:8000/api/health`
-- **Django Admin:** `http://127.0.0.1:8000/admin/` (`admin` / `EcoRota@2026`)
+Depois é só abrir **http://localhost:5173** no navegador.
+A API fica em `http://127.0.0.1:8000/api/health` e o painel admin em `http://127.0.0.1:8000/admin/` (`admin` / `EcoRota@2026`).
 
-## Comandos Úteis
+## Comandos úteis
 
-- `npm.cmd run db:reset` — recria o banco SQLite com os dados iniciais (124 locais: 34 unidades/museus USP, 4 bandejões e 86 estações do Metrô de SP)
-- `npm.cmd run build` — valida o build de produção do React
+- `npm.cmd run db:reset` — recria o banco local com os dados de teste
+- `npm.cmd run build` — gera o build de produção do frontend
 
-## Contas de Demonstração (senha: `EcoRota@2026`)
+## Contas de teste (apenas no ambiente local)
+
+Senha padrão: `EcoRota@2026`
 
 - **Motoristas:** `ana.lima@usp.br`, `bruno.silva@usp.br`
 - **Passageiros:** `carla.mendes@usp.br`, `diego.ferreira@usp.br`, `elisa.nogueira@usp.br`
+
+*(Na versão publicada no Render o banco começa limpo, sem contas fictícias — basta criar uma conta nova em `/cadastro`.)*
